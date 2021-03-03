@@ -36,6 +36,8 @@ classdef MultilayerPerceptron < handle
                 labels = labels(:, perm);
                 
                 for b = 1:int32(ceil(size(examples, 2) / batch_size) + 1)
+                    % fprintf('batch %d / %d\n', b, int32(ceil(size(examples, 2) / batch_size) + 1));
+                    
                     start_i = (b - 1) * (batch_size) + 1;
                     end_i = min(b * batch_size, size(examples, 2));
                     if start_i > end_i
@@ -94,6 +96,19 @@ classdef MultilayerPerceptron < handle
             for i = 1:size(obj.layers)
                 obj.layers(i).update();
             end
+        end
+        
+        function save_checkpoint(obj, ep)
+            filename = ['CP_' num2str(size(obj.layers(0).W, 1))];
+            for layer = obj.layers
+                filename = [filename '_' num2str(size(layer.W, 2))];
+            end
+            
+            
+        end
+        
+        function load_checkpoint()
+            
         end
     end
 end
