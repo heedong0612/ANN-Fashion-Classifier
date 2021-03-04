@@ -15,7 +15,7 @@ Example:
 mlp = MultilayerPerceptron(@cross_entropy, @d_cross_entropy);
 
 mlp.add_layer(PerceptronLayer(256, 784, @my_tanh, @d_my_tanh, lr, momentum, std));
-mlp.add_layer(PerceptronLayer(256, 784, @relu, @d_relu, lr, momentum, std));
-mlp.add_layer(PerceptronLayer(10, 256, @softmax, @d_softmax, lr, momentum, std));
+mlp.add_layer(PerceptronLayer(64, 256, @relu, @d_relu, lr, momentum, std));
+mlp.add_layer(PerceptronLayer(10, 64, @softmax, @d_softmax, lr, momentum, std));
 ```
 
