@@ -11,7 +11,7 @@ Instructions
     - delete the first row ("id", "label", "pixel1", "pixel2", ...)
     - delete the validation data (rows from 50,001 - 60,000)
 3) In the same depth as the 'utility' folder, make a directory called 'augmented'
-4) Currently this code performs 5 different augmentation. if you want, make changes to augment() function
+4) Currently this code performs 4 different augmentation. if you want, make changes to augment() function
 5) Run this code and the output will be saved in 'augmented' directory
 6) When you train your model on MATLAB, train with main_agumented() instead of main()
 
@@ -138,6 +138,7 @@ def augment(filename):
                     """
                     !!! Make changes here if you want more or less augmentation !!!
                         Don't forget to .ravel()
+                        Don't forget to change the range(n) in the for loop for writing labels
                     """
                     # writing origianl and augmented images
                     csvwriter1.writerows([sample.ravel(),\
