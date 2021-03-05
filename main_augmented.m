@@ -1,3 +1,8 @@
+% !!! IMPORTNAT !!!
+
+% this file saves the model it trained to a directory called 'models'
+% please make sure you have a directory 'models' before running this code
+
 function main_augmented()
     % make all folders fisible to matlab
     addpath('cost_functions');
