@@ -2,7 +2,7 @@
 
 **Note:** The folder `d_transfer_functions` stores the derivatives of the functions in `transfer_functions`. Likewise, the folder `d_cost_functions` stores the derivatives of the functions in `cost_functions`.
 
-### 3/3/2021
+### 3/10/2021
 
 **Added** model weights for ensemble voting in the function `utility/compute_prec_rec_weights.m`. Each model has a weight vector consisting of a weight value for each individual class (10 classes in this case). This value is computed by `precision * recall`. It will approach 1 if both precision and recall are high, and approach 0 if one or both are low.
 
