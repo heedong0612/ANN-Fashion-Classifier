@@ -15,7 +15,7 @@ function main()
     
     all_data = readmatrix('train.csv'); % read all 60,000 labeled datapoints and labels into matrix
     all_submission_data = readmatrix('test.csv'); % read all 10,000 submission datapoints into matrix
-    submission_data = all_submission_data(:, 2:785)'; % get rid of the useles "id" column in the submission file
+    submission_data = all_submission_data(:, 2:785)' * (1/255); % normalize, and get rid of the useles "id" column in the submission file
     
     all_examples = all_data(:, 3:786)' * (1/255); % normalize datapoints
     disp(all_examples(1:20, 1:10));
@@ -32,17 +32,15 @@ function main()
     stop_buff = 1;
     stop_thresh = -1;
     std = 0.4;
-    batch_size = 2000;
+    batch_size = 32;
     momentum = 0;
-    lr = 0.1;
+    lr = 0.05;
     
     % build model
-    mlp = MultilayerPerceptron(@squared_error, @d_squared_error);
-    mlp.add_layer(PerceptronLayer(300, 784, @my_tanh, @d_my_tanh, lr, momentum, std));
-    mlp.add_layer(PerceptronLayer(128, 300, @my_tanh, @d_my_tanh, lr, momentum, std));
-    mlp.add_layer(PerceptronLayer(128, 128, @my_tanh, @d_my_tanh, lr, momentum, std));
-    mlp.add_layer(PerceptronLayer(48, 128, @my_tanh, @d_my_tanh, lr, momentum, std));
-    mlp.add_layer(PerceptronLayer(10, 48, @sigmoid, @d_sigmoid, lr, momentum, std));
+    mlp = MultilayerPerceptron(@cross_entropy, @d_cross_entropy);
+    
+    mlp.add_layer(PerceptronLayer(256, 784, @my_tanh, @d_my_tanh, lr, momentum, std));
+    mlp.add_layer(PerceptronLayer(10, 256, @softmax, @d_softmax, lr, momentum, std));
     
     % train the model
     [losses, acc, acc_list] = mlp.fit( ...

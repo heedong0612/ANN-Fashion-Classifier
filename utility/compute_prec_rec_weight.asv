@@ -1,0 +1,17 @@
+function a = compute_prec_rec_weight(predictions, labels)
+    count = 0;
+    label_size = size(labels);
+    true_pos = predictions & labels;
+    precisions = sum(true_pos, 2
+    weight_vec = zeros(label_size(1), 1);
+    
+    for i = 1:label_size(1)
+        curr_true_pos = true_pos(i, 1:label_size(2));
+        precision = size(curr_true_pos(curr_true_pos == 1), 2) / size(predictions(predictions == 1), 2)
+        
+        if predictions(1:label_size(1), i) == labels(1:label_size(1), i)
+            count = count + 1;
+        end
+    end
+    a = count / label_size(2);
+end
