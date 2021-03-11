@@ -54,8 +54,17 @@ classdef Ensemble < handle
             weighted_votes = zeros(size(test_labels));
             
             for i = 1:size(obj.model_list, 2)
+                num_layers = size(obj.model_list(i).layers, 2);
+                
+                % temporrarily swap out the last layer transfer function for softmax
+                % temp_handle = obj.model_list(i).layers(num_layers).trans_func;
+                % obj.model_list(i).layers(num_layers).trans_func = @softmax;
+                
                 % get preditioncs
                 preds = obj.model_list(i).frozen_forward(vec);
+                
+                % revert last layer transfer function to original function
+                % obj.model_list(i).layers(num_layers).trans_func = temp_handle;
                 
                 % compute model weights
                 confidence_weights = repmat(compute_prec_rec_weight(hardmax(preds), test_labels), 1, size(vec, 2));
