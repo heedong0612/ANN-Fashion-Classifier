@@ -17,7 +17,7 @@ classdef MultilayerPerceptron < handle
             obj.layers = [obj.layers layer];
         end
         
-        function [losses, best_metric, all_metrics] = fit(obj, examples, labels, epochs, batch_size, stop_buff, stop_thresh, test_data, test_labels, metric_func)
+        function [losses, best_metric, all_metrics] = fit(obj, examples, labels, epochs, batch_size, stop_buff, stop_thresh, test_data, test_labels, metric_func, checkpoint_name)
             for i = 1:size(obj.layers, 2)
                 disp(size(obj.layers(i).W));
             end
@@ -28,6 +28,7 @@ classdef MultilayerPerceptron < handle
             epoch_losses = [];
             temp_avg_losses = [];
             metric = [];
+            best_metric = 0
             disp([0.0000 metric_func(hardmax(obj.frozen_forward(test_data)), test_labels)]);
             
             for e = 1:epochs
@@ -54,6 +55,11 @@ classdef MultilayerPerceptron < handle
                 metric = [metric metric_func(hardmax(obj.frozen_forward(test_data)), test_labels)];
                 disp([e metric(size(metric, 2))]);
                 
+                if(metric(length(metric)) > best_metric)
+                    best_metric = metric(length(metric));
+                    obj.try_save_checkpoint(checkpoint_name, best_metric);
+                end
+                
                 temp_avg_losses = avg_losses(:,:);
                 epoch_losses = [epoch_losses mean(temp_avg_losses)];
                 if(doEarlyStop(e, metric, stop_buff, stop_thresh))
@@ -62,8 +68,14 @@ classdef MultilayerPerceptron < handle
             end
             
             losses = epoch_losses;
-            best_metric = metric(size(metric, 2));
             all_metrics = metric;
+        end
+        
+        function try_save_checkpoint(obj, filename, metric)
+            metric_str = num2str(metric);
+            model_timestamp = filename + "_METRIC_" + metric_str(3:size(metric_str, 2)) + '.mat';
+            mlp = obj;
+            save(model_timestamp, "mlp");
         end
         
         function out = forward(obj, vec)
