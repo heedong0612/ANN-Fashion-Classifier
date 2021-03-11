@@ -3,6 +3,20 @@
 **Note:** The folder `d_transfer_functions` stores the derivatives of the functions in `transfer_functions`. Likewise, the folder `d_cost_functions` stores the derivatives of the functions in `cost_functions`.
 
 
+## 3/11/2021
+
+**Added**  Ensemble main. The file `ensemble_main.m` now uses saved models instead of training new ones in it.
+
+Example:
+```
+% load models
+load("models/model_2021_3_3_5_14.mat", "mlp");     
+ensemble.add_model(mlp);
+
+load("models/aug_model_2021_3_4_5_9.mat", "mlp");     
+ensemble.add_model(mlp);
+```
+
 ## 3/10/2021
 
 **Added**  Ensemble model. This model trains multiple independent models and has them vote on a final prediction.
