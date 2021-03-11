@@ -5,6 +5,8 @@
 
 ## 3/11/2021
 
+**Added**  models directory. Trained models are saved here. 
+
 **Added**  Ensemble main. The file `ensemble_main.m` now uses saved models instead of training new ones in it.
 
 Example:
