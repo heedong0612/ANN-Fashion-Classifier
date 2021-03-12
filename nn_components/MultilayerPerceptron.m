@@ -81,7 +81,7 @@ classdef MultilayerPerceptron < handle
             
             % find and delete the other model
             files = ls('models/*.mat');
-            disp(files);
+            
             filename = extractAfter(filename, "models/") + "_METRIC_";
 
             for n = 1:height(files)
