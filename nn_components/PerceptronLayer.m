@@ -3,7 +3,8 @@ classdef PerceptronLayer < handle
         trans_func % layer transfer function
         d_trans_func % derivative of layer transfer function
         batch_count % current count of how many examples have been seen in the current batch
-        lr
+        lr_max
+        lr_min
         W % layer weights
         b % layer biases
         n % most recent net input, needed for backprop (backward)
@@ -18,10 +19,11 @@ classdef PerceptronLayer < handle
     end
     
     methods
-        function obj = PerceptronLayer(arg1, arg2, trans_func, d_trans_func, learn_rate, momentum, std)
+        function obj = PerceptronLayer(arg1, arg2, trans_func, d_trans_func, learn_rate_max, learn_rate_min, momentum, std)
             obj.trans_func = trans_func;
             obj.d_trans_func = d_trans_func;
-            obj.lr = learn_rate;
+            obj.lr_max = learn_rate_max;
+            obj.lr_min = learn_rate_min;
             obj.momentum = momentum;
             
             % If both arguments are scalers, create random weight matrix and
@@ -56,12 +58,21 @@ classdef PerceptronLayer < handle
             obj.add_to_s(obj.d_trans_func(obj.n) .* (next_W' * next_s));
         end
         
-        function update(obj)
+        function update(obj, epoch_progress)
             obj.avg_s = obj.avg_s / obj.batch_count;
             obj.avg_sp = obj.avg_sp / obj.batch_count;
             
-            obj.W = obj.W + ((obj.lr * (1 - obj.momentum) * obj.avg_sp) + (obj.momentum * obj.last_W_update));
-            obj.b = obj.b + ((obj.lr * (1 - obj.momentum) * obj.avg_s) + (obj.momentum * obj.last_b_update));
+            if obj.lr_min == obj.lr_max 
+               lr = obj.lr_min; 
+            else
+               lr = obj.lr_max - (obj.lr_max - obj.lr_min) * epoch_progress;
+            end
+            
+            disp("epoch_ prog: " + epoch_progress);
+            disp("lr: " + lr);
+            
+            obj.W = obj.W + ((lr * (1 - obj.momentum) * obj.avg_sp) + (obj.momentum * obj.last_W_update));
+            obj.b = obj.b + ((lr * (1 - obj.momentum) * obj.avg_s) + (obj.momentum * obj.last_b_update));
             
             obj.reset_for_next_batch();
         end

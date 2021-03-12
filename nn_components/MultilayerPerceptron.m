@@ -48,7 +48,7 @@ classdef MultilayerPerceptron < handle
                         a = obj.forward(examples(1:size(examples, 1), i));
                         batch_losses(i - start_i + 1) = obj.backward(a, labels(1:size(labels, 1), i));
                     end
-                    obj.update();
+                    obj.update((e-1)/epochs); % pass current progress
                     avg_losses = [avg_losses mean(batch_losses(1:(end_i - start_i + 1)))];
                 end
                 
@@ -119,9 +119,9 @@ classdef MultilayerPerceptron < handle
             loss = mean(obj.cost_func(last_a, target));
         end
         
-        function update(obj)
+        function update(obj, epoch_progress)
             for i = 1:size(obj.layers)
-                obj.layers(i).update();
+                obj.layers(i).update(epoch_progress);
             end
         end
         

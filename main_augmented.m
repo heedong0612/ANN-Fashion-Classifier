@@ -15,8 +15,12 @@ function main_augmented()
     addpath('augmented');
     
     % read data -- CHANGE THE FILE TO YOUR AUGMENTED DATASET
-    aug_data = readmatrix('augmented/augmented_train_2021_03_10_19_56_04.csv'); 
-    aug_label = readmatrix('augmented/augmented_label_2021_03_10_19_56_04.csv');
+    
+    aug_data = readmatrix('augmented/small_augmented_train.csv'); 
+    aug_label = readmatrix('augmented/small_agumented_label.csv');
+    
+    % aug_data = readmatrix('augmented/augmented_train_2021_03_12_15_15_00.csv'); 
+    % aug_label = readmatrix('augmented/augmented_label_2021_03_12_15_15_00.csv');
     disp(size(aug_label));
     
     all_submission_data = readmatrix('test.csv'); % read all 10,000 submission datapoints into matrix
@@ -37,24 +41,25 @@ function main_augmented()
     valid_labels = all_labels(:, (TRAIN_SIZE + 1):60000);
     
     % hyperparameters
-    epochs = 60;
+    epochs = 20;
     stop_buff = 1;
     stop_thresh = -1;
     std = 0.4;
-    batch_size = 24;
-    momentum = 0.9;
-    lr = 0.05;
+    batch_size = 24; %500;
+    momentum = 1.1;
+    lr_max = 1;
+    lr_min = 0.02;
     
     % build model
     mlp = MultilayerPerceptron(@cross_entropy, @d_cross_entropy);
+   
+    mlp.add_layer(PerceptronLayer(350, 784, @sigmoid, @d_sigmoid, lr_max, lr_min, momentum, std));
+    mlp.add_layer(PerceptronLayer(170, 350, @sigmoid, @d_sigmoid, lr_max, lr_min,momentum, std));
+    mlp.add_layer(PerceptronLayer(10, 170, @relu, @d_relu, lr_max, lr_min, momentum, std));
     
-    mlp.add_layer(PerceptronLayer(400, 784, @my_tanh, @d_my_tanh, lr, momentum, std));
-    mlp.add_layer(PerceptronLayer(250, 400, @sigmoid, @d_sigmoid, lr, momentum, std));
-    mlp.add_layer(PerceptronLayer(100, 250, @sigmoid, @d_sigmoid, lr, momentum, std));
-    mlp.add_layer(PerceptronLayer(10, 100, @softmax, @d_linear, lr, momentum, std));
     
     % change each run to make identifying models easier
-    model_name = "FreddieModelson_aug";
+    model_name = "TestModel";
     
     t = datetime('now');
     model_timestamp = "models/" + model_name + "_" + year(t) + '_' + month(t) + '_' + day(t) + '_' + hour(t) + '_' + minute(t);
