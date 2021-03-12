@@ -71,10 +71,8 @@ classdef MultilayerPerceptron < handle
             all_metrics = metric;
         end
         
-        % delete other model if this one has a higher accuracy
-        % don't save this model if it scored lowere than the other one
         function try_save_checkpoint(obj, filename, metric)
-            disp("triggered")
+            
             % save current model
             metric_str = num2str(metric);
             model_timestamp = filename + "_METRIC_" + metric_str(3:size(metric_str, 2)) + '.mat';
