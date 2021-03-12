@@ -71,11 +71,29 @@ classdef MultilayerPerceptron < handle
             all_metrics = metric;
         end
         
+        % delete other model if this one has a higher accuracy
+        % don't save this model if it scored lowere than the other one
         function try_save_checkpoint(obj, filename, metric)
+
+            % save current model
             metric_str = num2str(metric);
             model_timestamp = filename + "_METRIC_" + metric_str(3:size(metric_str, 2)) + '.mat';
             mlp = obj;
             save(model_timestamp, "mlp");
+            
+            % find and delete the other model
+            files = ls('models/*.mat');
+            
+            filename = filename + "_METRIC_";
+            filename = extractAfter(filename, "models/");
+
+            for n = 1:height(files)
+                
+                if contains(files(n,:), filename) & (files(n,:) ~= extractAfter(model_timestamp, "models/")) % to avoid deleting the current model
+                   delete("models/" + files(n,:));
+                   break
+                end
+            end 
         end
         
         function out = forward(obj, vec)
