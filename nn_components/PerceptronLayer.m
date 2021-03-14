@@ -68,9 +68,6 @@ classdef PerceptronLayer < handle
                lr = obj.lr_max - (obj.lr_max - obj.lr_min) * epoch_progress;
             end
             
-            disp("epoch_ prog: " + epoch_progress);
-            disp("lr: " + lr);
-            
             obj.W = obj.W + ((lr * (1 - obj.momentum) * obj.avg_sp) + (obj.momentum * obj.last_W_update));
             obj.b = obj.b + ((lr * (1 - obj.momentum) * obj.avg_s) + (obj.momentum * obj.last_b_update));
             

@@ -2,6 +2,21 @@
 
 **Note:** The folder `d_transfer_functions` stores the derivatives of the functions in `transfer_functions`. Likewise, the folder `d_cost_functions` stores the derivatives of the functions in `cost_functions`.
 
+## 3/12/2021
+
+**Added**  learning rate decay. You can specify max and min learning rate to perform linear learning rate decay based on epoch progress. If you want a constant learning rate, pass the same number for max and min learning rate.
+
+Example:
+```
+lr_max = 1;
+lr_min = 0.02;
+
+...
+
+mlp.add_layer(PerceptronLayer(350, 784, @sigmoid, @d_sigmoid, lr_max, lr_min, momentum, std));
+mlp.add_layer(PerceptronLayer(170, 350, @sigmoid, @d_sigmoid, lr_max, lr_min,momentum, std));
+mlp.add_layer(PerceptronLayer(10, 170, @relu, @d_relu, lr_max, lr_min, momentum, std));
+```
 
 ## 3/11/2021
 
