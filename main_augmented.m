@@ -14,9 +14,13 @@ function main_augmented()
     addpath('nn_components');
     addpath('augmented');
     
-   % read data -- CHANGE THE FILE TO YOUR AUGMENTED DATASET
-    aug_data = readmatrix('augmented/augmented_train_2021_03_03_23_56_09.csv'); 
-    aug_label = readmatrix('augmented/augmented_label_2021_03_03_23_56_09.csv');
+    % read data -- CHANGE THE FILE TO YOUR AUGMENTED DATASET
+    
+    aug_data = readmatrix('augmented/small_augmented_train.csv'); 
+    aug_label = readmatrix('augmented/small_agumented_label.csv');
+    
+    % aug_data = readmatrix('augmented/augmented_train_2021_03_12_15_15_00.csv'); 
+    % aug_label = readmatrix('augmented/augmented_label_2021_03_12_15_15_00.csv');
     disp(size(aug_label));
     
     all_submission_data = readmatrix('test.csv'); % read all 10,000 submission datapoints into matrix
@@ -37,21 +41,28 @@ function main_augmented()
     valid_labels = all_labels(:, (TRAIN_SIZE + 1):60000);
     
     % hyperparameters
-    epochs = 60;
+    epochs = 20;
     stop_buff = 1;
     stop_thresh = -1;
     std = 0.4;
-    batch_size = 32*2;
-    momentum = 1;
-    lr = 0.07;
+    batch_size = 24; %500;
+    momentum = 1.1;
+    lr_max = 1;
+    lr_min = 0.02;
     
     % build model
-    mlp = MultilayerPerceptron(@squared_error, @d_squared_error);
+    mlp = MultilayerPerceptron(@cross_entropy, @d_cross_entropy);
+   
+    mlp.add_layer(PerceptronLayer(350, 784, @sigmoid, @d_sigmoid, lr_max, lr_min, momentum, std));
+    mlp.add_layer(PerceptronLayer(170, 350, @sigmoid, @d_sigmoid, lr_max, lr_min,momentum, std));
+    mlp.add_layer(PerceptronLayer(10, 170, @relu, @d_relu, lr_max, lr_min, momentum, std));
     
-    mlp.add_layer(PerceptronLayer(400, 784, @sigmoid, @d_sigmoid, lr, momentum, std));
-    mlp.add_layer(PerceptronLayer(250, 400, @sigmoid, @d_sigmoid, lr, momentum, std));
-    mlp.add_layer(PerceptronLayer(100, 250, @sigmoid, @d_sigmoid, lr, momentum, std));
-    mlp.add_layer(PerceptronLayer(10, 100, @relu, @d_relu, lr, momentum, std));
+    
+    % change each run to make identifying models easier
+    model_name = "TestModel";
+    
+    t = datetime('now');
+    model_timestamp = "models/" + model_name + "_" + year(t) + '_' + month(t) + '_' + day(t) + '_' + hour(t) + '_' + minute(t);
     
     % train the model
     [losses, acc, acc_list] = mlp.fit( ...
@@ -63,7 +74,8 @@ function main_augmented()
         stop_thresh, ...
         valid_data, ...
         valid_labels, ...
-        @accuracy ...
+        @accuracy, ...
+        model_timestamp ...
     );
     disp(" ==================== losses ====================" );
     disp(losses);
@@ -77,11 +89,10 @@ function main_augmented()
     submission_matrix = [(60001:70000)' final_preds];
     
     % write submission matrix to data/SUBMISSION.csv
-    t = datetime('now');
-    submission_timestamp = "data/aug_submission_" + year(t) + '_' + month(t) + '_' + day(t) + '_' + hour(t) + '_' + minute(t) + '.csv';
+    submission_timestamp = "data/" + model_name + "_submission_" + year(t) + '_' + month(t) + '_' + day(t) + '_' + hour(t) + '_' + minute(t) + '.csv';
     writematrix(submission_matrix, submission_timestamp);
     
     % save the model
-    model_timestamp = "models/aug_model_" + year(t) + '_' + month(t) + '_' + day(t) + '_' + hour(t) + '_' + minute(t) + '.mat';
-    save(model_timestamp, "mlp");
+    % model_timestamp = "models/models/" + model_name + "_" + year(t) + '_' + month(t) + '_' + day(t) + '_' + hour(t) + '_' + minute(t) + '.mat';
+    % save(model_timestamp, "mlp");
 end

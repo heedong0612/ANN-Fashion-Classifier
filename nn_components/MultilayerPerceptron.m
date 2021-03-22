@@ -17,7 +17,7 @@ classdef MultilayerPerceptron < handle
             obj.layers = [obj.layers layer];
         end
         
-        function [losses, best_metric, all_metrics] = fit(obj, examples, labels, epochs, batch_size, stop_buff, stop_thresh, test_data, test_labels, metric_func)
+        function [losses, best_metric, all_metrics] = fit(obj, examples, labels, epochs, batch_size, stop_buff, stop_thresh, test_data, test_labels, metric_func, checkpoint_name)
             for i = 1:size(obj.layers, 2)
                 disp(size(obj.layers(i).W));
             end
@@ -28,6 +28,7 @@ classdef MultilayerPerceptron < handle
             epoch_losses = [];
             temp_avg_losses = [];
             metric = [];
+            best_metric = 0
             disp([0.0000 metric_func(hardmax(obj.frozen_forward(test_data)), test_labels)]);
             
             for e = 1:epochs
@@ -47,12 +48,17 @@ classdef MultilayerPerceptron < handle
                         a = obj.forward(examples(1:size(examples, 1), i));
                         batch_losses(i - start_i + 1) = obj.backward(a, labels(1:size(labels, 1), i));
                     end
-                    obj.update();
+                    obj.update((e-1)/epochs); % pass current progress
                     avg_losses = [avg_losses mean(batch_losses(1:(end_i - start_i + 1)))];
                 end
                 
                 metric = [metric metric_func(hardmax(obj.frozen_forward(test_data)), test_labels)];
                 disp([e metric(size(metric, 2))]);
+                
+                if(metric(length(metric)) > best_metric)
+                    best_metric = metric(length(metric));
+                    obj.try_save_checkpoint(checkpoint_name, best_metric);
+                end
                 
                 temp_avg_losses = avg_losses(:,:);
                 epoch_losses = [epoch_losses mean(temp_avg_losses)];
@@ -62,8 +68,29 @@ classdef MultilayerPerceptron < handle
             end
             
             losses = epoch_losses;
-            best_metric = metric(size(metric, 2));
             all_metrics = metric;
+        end
+        
+        function try_save_checkpoint(obj, filename, metric)
+            
+            % save current model
+            metric_str = num2str(metric);
+            model_timestamp = filename + "_METRIC_" + metric_str(3:size(metric_str, 2)) + '.mat';
+            mlp = obj;
+            save(model_timestamp, "mlp");
+            
+            % find and delete the other model
+            files = ls('models/*.mat');
+            
+            filename = extractAfter(filename, "models/") + "_METRIC_";
+
+            for n = 1:height(files)
+                
+                if contains(files(n,:), filename) & (strtrim(files(n,:)) ~= extractAfter(model_timestamp, "models/")) % to avoid deleting the current model
+                   delete("models/" + files(n,:));
+                   break
+                end
+            end 
         end
         
         function out = forward(obj, vec)
@@ -92,9 +119,9 @@ classdef MultilayerPerceptron < handle
             loss = mean(obj.cost_func(last_a, target));
         end
         
-        function update(obj)
+        function update(obj, epoch_progress)
             for i = 1:size(obj.layers)
-                obj.layers(i).update();
+                obj.layers(i).update(epoch_progress);
             end
         end
         
