@@ -1,6 +1,7 @@
 # CSS-485 Final Project
 
-**Note:** The folder `d_transfer_functions` stores the derivatives of the functions in `transfer_functions`. Likewise, the folder `d_cost_functions` stores the derivatives of the functions in `cost_functions`.
+## Report
+The report for this project is found [here](Fashion-MNIST%20Final%20Classification%20Project.pdf)
 
 ## 3/12/2021
 
